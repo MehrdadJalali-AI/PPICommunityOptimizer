@@ -1,4 +1,4 @@
-# Community Detection Pipeline with LEA Optimization
+# Optimizing Overlapping Protein Community Detection in PPI Networks using Lotus Effect Algorithm with Functional Dependency and Permanence Metrics
 
 A complete Python pipeline for protein-protein interaction (PPI) network community detection using the Lotus Effect Algorithm (LEA) for optimization.
 
