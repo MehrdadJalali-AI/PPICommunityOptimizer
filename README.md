@@ -1,5 +1,7 @@
 # Optimizing Overlapping Protein Community Detection in PPI Networks using Lotus Effect Algorithm with Functional Dependency and Permanence Metrics
-![Overlapping Protein Community Detection with Lotus Effect Algorithm](PPILEA.jpg){width=100}
+<div align="center">
+  <img src="PPILEA.jpg" alt="Overlapping Protein Community Detection with Lotus Effect Algorithm" width="500"/>
+</div>
 
 A complete Python pipeline for protein-protein interaction (PPI) network community detection using the Lotus Effect Algorithm (LEA) for optimization.
 
