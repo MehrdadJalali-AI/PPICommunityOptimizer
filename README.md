@@ -95,15 +95,35 @@ wget http://geneontology.org/gene-associations/goa_saccharomyces.gaf.gz
 
 ## Usage
 
-### Basic Usage
+### STRING Mode (Default)
 
 ```bash
-python main.py --taxid 4932 --string-mode download --threshold 700 --go-source goa --outdir outputs/
+python main.py --mode string --taxid 4932 --string-mode download --threshold 700 --go-file goa_file.gaf.gz --outdir outputs/
 ```
+
+### Gavin PPI Mode
+
+```bash
+python main.py \
+  --mode gavin \
+  --ppi gavin2006_socioaffinities_rescaled.txt \
+  --go-file GO.txt \
+  --go-use-symbol \
+  --go-taxid 559292 \
+  --outdir outputs_gavin/
+```
+
+See [GAVIN_MODE.md](GAVIN_MODE.md) for detailed Gavin mode instructions.
 
 ### Command-Line Arguments
 
-- `--taxid`: NCBI taxonomy ID (required)
+**Data Source Selection:**
+- `--mode`: Data source mode
+  - `string`: STRING database (default)
+  - `gavin`: Gavin PPI network
+
+**STRING Mode Arguments:**
+- `--taxid`: NCBI taxonomy ID (required for STRING mode)
   - Example: `4932` for S. cerevisiae, `9606` for H. sapiens
   
 - `--string-mode`: STRING data loading mode
@@ -113,12 +133,19 @@ python main.py --taxid 4932 --string-mode download --threshold 700 --go-source g
 - `--threshold`: STRING combined score threshold (0-1000)
   - Default: `700` (high confidence)
   - Lower values (e.g., `400`) include more interactions
+
+**Gavin Mode Arguments:**
+- `--ppi`: Path to Gavin PPI file (required for Gavin mode)
+  - Format: tab-separated `protein1\tprotein2\tweight`
+
+**GO Annotation Arguments:**
+- `--go-file`: Path to GO annotation file (GAF format, required)
   
-- `--go-source`: GO annotation source
-  - Currently only `goa` supported
+- `--go-use-symbol`: Use DB_Object_Symbol instead of DB_Object_ID
+  - Required for SGD GAF files (Gavin mode)
   
-- `--go-file`: Path to GOA GAF file
-  - If not provided, looks for `cache/goa_{taxid}.gaf.gz`
+- `--go-taxid`: Taxonomy ID to filter GO annotations
+  - Example: `559292` for S. cerevisiae (SGD)
   
 - `--outdir`: Output directory for results
   - Default: `outputs/`
