@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 dataset,method,overlapping,num_nodes,num_edges,num_communities,avg_community_size,modularity,nmi,overlapping_nmi,conductance,runtime_sec,parameters
 STRING,Louvain,False,5966,120386,24,248.58333333333334,0.6336746637958329,,,0.13775776144974958,1.7225761413574219,"{""resolution"": 1.0, ""random_seed"": 42, ""runtime"": 1.7225620746612549}"
 STRING,Leiden,False,5966,120386,24,248.58333333333334,0.6336746637958329,,,0.13775776144974958,1.7639479637145996,"{""resolution"": 1.0, ""random_seed"": 42, ""runtime"": 1.763861894607544}"
@@ -15,3 +16,22 @@ Gavin,OSLOM,False,1860,7601,46,40.43478260869565,0.03671187574059357,,,0.0,0.000
 Gavin,Link_Communities,True,1860,7601,46,40.43478260869565,0.03671187574059357,,,0.0,0.0009181499481201172,"{""fallback"": ""connected_components"", ""runtime"": 0.0008969306945800781}"
 Gavin,BigCLAM,True,1860,7601,46,40.43478260869565,0.03671187574059357,,,0.0,0.0009021759033203125,"{""num_communities"": null, ""fallback"": ""connected_components"", ""runtime"": 0.0008790493011474609}"
 Gavin,LEA_Overlapping,True,1860,7601,47,39.57446808510638,0.03669980308680386,,,0.02165789674368947,56.09355401992798,"{""alpha"": 0.8701905606489782, ""overlap_tau"": 0.847461472935916, ""transfer_tau"": 0.5370598209049435, ""lea_evaluations"": 500, ""random_seed"": 42}"
+=======
+dataset,method,overlapping,num_nodes,num_edges,num_communities,avg_community_size,modularity,nmi,overlapping_nmi,conductance,mean_go_jaccard,runtime_sec,parameters
+STRING,Louvain,FALSE,5966,120386,24,248.5833333,0.633674664,,,0.137757761,,1.829926968,"{""resolution"": 1.0, ""random_seed"": 42, ""runtime"": 1.829906940460205}"
+STRING,Leiden,FALSE,5966,120386,24,248.5833333,0.633674664,,,0.137757761,,1.819311142,"{""resolution"": 1.0, ""random_seed"": 42, ""runtime"": 1.8192451000213623}"
+STRING,Infomap,FALSE,5966,120386,11,542.3636364,0.000984784,,,0,,0.010006905,"{""random_seed"": 42, ""fallback"": ""connected_components"", ""runtime"": 0.00995492935180664}"
+STRING,MCL,FALSE,5966,120386,14,424,0.633433781,,,0.236156162,,1.746818781,"{""inflation"": 2.0, ""min_cluster_size"": 10, ""fallback"": ""MCLClustering_wrapper"", ""runtime"": 1.7466962337493896}"
+STRING,OSLOM,FALSE,5966,120386,11,542.3636364,0.000984784,,,0,,0.008259058,"{""fallback"": ""connected_components"", ""runtime"": 0.008208274841308594}"
+STRING,Link_Communities,TRUE,5966,120386,11,542.3636364,0.000984784,,,0,,0.010123014,"{""fallback"": ""connected_components"", ""runtime"": 0.010061025619506836}"
+STRING,BigCLAM,TRUE,5966,120386,11,542.3636364,0.000984784,,,0,,0.00780797,"{""num_communities"": null, ""fallback"": ""connected_components"", ""runtime"": 0.007748842239379883}"
+STRING,LEA_Overlapping,TRUE,5966,120386,15,395.7333333,0.642499774,,,0.233464286,,186.8638711,"{""alpha"": 0.3764306978054222, ""overlap_tau"": 0.9093643187837515, ""transfer_tau"": 0.7338617838478629, ""lea_evaluations"": 500, ""random_seed"": 42}"
+Gavin,Louvain,FALSE,1860,7601,47,39.57446809,0.040169077,,,0.016198663,0.173233878,0.089608192,"{""resolution"": 1.0, ""random_seed"": 42, ""runtime"": 0.08960199356079102}"
+Gavin,Leiden,FALSE,1860,7601,47,39.57446809,0.040169077,,,0.016198663,0.173233878,0.092588186,"{""resolution"": 1.0, ""random_seed"": 42, ""runtime"": 0.0925607681274414}"
+Gavin,Infomap,FALSE,1860,7601,46,40.43478261,0.036711876,,,0,0.173233878,0.000795841,"{""random_seed"": 42, ""fallback"": ""connected_components"", ""runtime"": 0.0007760524749755859}"
+Gavin,MCL,FALSE,1860,7601,2,868,0.025853177,,,0.067335244,0.173233878,0.097960949,"{""inflation"": 2.0, ""min_cluster_size"": 10, ""fallback"": ""MCLClustering_wrapper"", ""runtime"": 0.09792780876159668}"
+Gavin,OSLOM,FALSE,1860,7601,46,40.43478261,0.036711876,,,0,0.173233878,0.000841856,"{""fallback"": ""connected_components"", ""runtime"": 0.0008249282836914062}"
+Gavin,Link_Communities,TRUE,1860,7601,46,40.43478261,0.036711876,,,0,0.173233878,0.00080514,"{""fallback"": ""connected_components"", ""runtime"": 0.0007860660552978516}"
+Gavin,BigCLAM,TRUE,1860,7601,46,40.43478261,0.036711876,,,0,0.173233878,0.000837803,"{""num_communities"": null, ""fallback"": ""connected_components"", ""runtime"": 0.0008108615875244141}"
+Gavin,LEA_Overlapping,TRUE,1860,7601,2,868,0.025853177,,,0.067335244,0.173233878,40.15497088,"{""alpha"": 0.8701905606489782, ""overlap_tau"": 0.847461472935916, ""transfer_tau"": 0.5370598209049435, ""lea_evaluations"": 500, ""random_seed"": 42}"
+>>>>>>> Stashed changes

@@ -33,6 +33,7 @@ def load_string_dataset(taxid: int = 4932, threshold: int = 700):
     loader = STRINGLoader(taxid, cache_dir='cache', threshold=threshold)
     graph, aliases = loader.load_from_download()
     
+<<<<<<< Updated upstream
     # Get initial clusters for LEA
     mcl = MCLClustering(inflation=2.0)
     initial_clusters = mcl.cluster(graph)
@@ -40,14 +41,53 @@ def load_string_dataset(taxid: int = 4932, threshold: int = 700):
     # Try to load GO annotations
     go_loader = GOLoader('cache')
     gaf_file = f'cache/goa_{taxid}.gaf.gz'
+=======
+    # Get initial clusters for LEA (filter small clusters < 10 proteins)
+    mcl = MCLClustering(inflation=2.0, min_cluster_size=10)
+    initial_clusters = mcl.cluster(graph)
+    
+    # Try to load GO annotations
+    # Check for both possible filenames (goa_saccharomyces.gaf.gz or goa_{taxid}.gaf.gz)
+    go_loader = GOLoader('cache')
+    gaf_file = None
+    
+    # Try standard filename first (what download_goa.py creates)
+    possible_files = [
+        f'cache/goa_saccharomyces.gaf.gz',  # Standard download filename
+        f'cache/goa_{taxid}.gaf.gz',  # Alternative naming convention
+        f'cache/goa_saccharomyces.gaf',  # Uncompressed version
+        f'cache/goa_{taxid}.gaf',  # Uncompressed alternative
+    ]
+    
+    for filename in possible_files:
+        if os.path.exists(filename):
+            gaf_file = filename
+            logger.info(f"Found GO file: {gaf_file}")
+            break
+    
+>>>>>>> Stashed changes
     protein_go_terms = {}
     go_tfidf = None
     permanence_scores = {}
     
+<<<<<<< Updated upstream
     if os.path.exists(gaf_file):
         protein_go_terms = go_loader.load_from_gaf(gaf_file, taxid)
         go_tfidf = GOTFIDF(initial_clusters, protein_go_terms)
         permanence_scores = calculate_permanence_all_proteins(initial_clusters, graph)
+=======
+    if gaf_file:
+        protein_go_terms = go_loader.load_from_gaf(gaf_file, taxid=taxid)
+        if protein_go_terms:
+            logger.info(f"Loaded GO annotations for {len(protein_go_terms)} proteins")
+            go_tfidf = GOTFIDF(initial_clusters, protein_go_terms)
+            permanence_scores = calculate_permanence_all_proteins(initial_clusters, graph)
+        else:
+            logger.warning(f"GO file {gaf_file} exists but no annotations were loaded")
+    else:
+        logger.warning(f"GO file not found. Tried: {', '.join(possible_files)}")
+        logger.warning("Run 'python download_goa.py' to download GO annotations")
+>>>>>>> Stashed changes
     
     lea_data = {
         'initial_clusters': initial_clusters,
@@ -66,8 +106,13 @@ def load_gavin_dataset(ppi_file: str = 'gavin2006_socioaffinities_rescaled.txt',
     loader = GavinLoader(normalize=True)
     graph = loader.load(ppi_file)
     
+<<<<<<< Updated upstream
     # Get initial clusters for LEA
     mcl = MCLClustering(inflation=2.0)
+=======
+    # Get initial clusters for LEA (filter small clusters < 10 proteins)
+    mcl = MCLClustering(inflation=2.0, min_cluster_size=10)
+>>>>>>> Stashed changes
     initial_clusters = mcl.cluster(graph)
     
     # Load GO annotations
@@ -117,13 +162,24 @@ def main():
         graph_str, lea_data_str = load_string_dataset()
         if args.skip_lea:
             lea_data_str = None
+<<<<<<< Updated upstream
+=======
+        # Extract protein_go_terms for external evaluation
+        protein_go_terms_str = lea_data_str.get('protein_go_terms', {}) if lea_data_str else {}
+        
+>>>>>>> Stashed changes
         results_str = compare_all_methods(
             graph_str,
             'STRING',
             ground_truth=None,  # No ground truth available
             lea_data=lea_data_str,
             lea_evaluations=args.lea_evaluations,
+<<<<<<< Updated upstream
             random_seed=random_seed
+=======
+            random_seed=random_seed,
+            protein_go_terms=protein_go_terms_str
+>>>>>>> Stashed changes
         )
         all_results.append(results_str)
         logger.info(f"STRING: {len(results_str)} methods completed")
@@ -138,13 +194,24 @@ def main():
         graph_gav, lea_data_gav = load_gavin_dataset()
         if args.skip_lea:
             lea_data_gav = None
+<<<<<<< Updated upstream
+=======
+        # Extract protein_go_terms for external evaluation
+        protein_go_terms_gav = lea_data_gav.get('protein_go_terms', {}) if lea_data_gav else {}
+        
+>>>>>>> Stashed changes
         results_gav = compare_all_methods(
             graph_gav,
             'Gavin',
             ground_truth=None,  # No ground truth available
             lea_data=lea_data_gav,
             lea_evaluations=args.lea_evaluations,
+<<<<<<< Updated upstream
             random_seed=random_seed
+=======
+            random_seed=random_seed,
+            protein_go_terms=protein_go_terms_gav
+>>>>>>> Stashed changes
         )
         all_results.append(results_gav)
         logger.info(f"Gavin: {len(results_gav)} methods completed")

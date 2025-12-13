@@ -1,0 +1,7 @@
+Metric,Note,STRING - MCL,STRING - LEAF-PPI,STRING - Improvement,Gavin - MCL,Gavin - LEAF-PPI,Gavin - Improvement
+Modularity,Higher is better,0.633434,0.640886,+1.18% (improvement),0.025853,0.025853,+0.00% (improvement)
+Conductance,Lower is better,0.236156,0.247075,-4.62% (degradation),0.067335,0.067335,+0.00% (no change)
+Number of Communities,Context-dependent,14.000000,14.000000,,2.000000,2.000000,
+Avg Community Size,Context-dependent,424.000000,424.000000,,868.000000,868.000000,
+GO Jaccard Similarity,Higher is better,N/A,N/A,N/A,0.173234,0.173234,+0.00% (no change)
+Runtime (seconds),Lower is better,2.061812,181.540233,-8704.89% (degradation),0.104669,40.951984,-39025.28% (degradation)

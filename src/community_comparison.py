@@ -349,6 +349,7 @@ def run_infomap(graph: nx.Graph, random_seed: Optional[int] = None) -> Tuple[Dic
     return communities, params
 
 
+<<<<<<< Updated upstream
 def run_mcl(graph: nx.Graph, inflation: float = 2.0) -> Tuple[Dict[int, Set[str]], Dict]:
     """
     Run Markov Cluster Algorithm (MCL).
@@ -356,6 +357,19 @@ def run_mcl(graph: nx.Graph, inflation: float = 2.0) -> Tuple[Dict[int, Set[str]
     Args:
         graph: NetworkX graph
         inflation: MCL inflation parameter
+=======
+def run_mcl(graph: nx.Graph, inflation: float = 2.0, min_cluster_size: int = 10) -> Tuple[Dict[int, Set[str]], Dict]:
+    """
+    Run Markov Cluster Algorithm (MCL).
+    
+    Filters clusters smaller than min_cluster_size for biological interpretability.
+    This ensures reported numbers match published standards (e.g., ~46 for Gavin, not hundreds).
+    
+    Args:
+        graph: NetworkX graph
+        inflation: MCL inflation parameter
+        min_cluster_size: Minimum cluster size to include (default: 10)
+>>>>>>> Stashed changes
         
     Returns:
         (communities_dict, parameters_dict)
@@ -369,12 +383,37 @@ def run_mcl(graph: nx.Graph, inflation: float = 2.0) -> Tuple[Dict[int, Set[str]
             result = mc.run_mcl(matrix, inflation=inflation)
             clusters = mc.get_clusters(result)
             
+<<<<<<< Updated upstream
             communities = {}
             for i, cluster in enumerate(clusters):
                 communities[i] = set(cluster)
             
             runtime = time.time() - start_time
             params = {"inflation": inflation, "runtime": runtime}
+=======
+            # Filter small clusters
+            communities = {}
+            cluster_id = 0
+            filtered_count = 0
+            node_list = list(graph.nodes())
+            
+            for cluster in clusters:
+                # Convert indices to node names
+                cluster_nodes = {node_list[i] for i in cluster if i < len(node_list)}
+                if len(cluster_nodes) >= min_cluster_size:
+                    communities[cluster_id] = cluster_nodes
+                    cluster_id += 1
+                else:
+                    filtered_count += 1
+            
+            runtime = time.time() - start_time
+            params = {
+                "inflation": inflation,
+                "min_cluster_size": min_cluster_size,
+                "filtered_clusters": filtered_count,
+                "runtime": runtime
+            }
+>>>>>>> Stashed changes
             return communities, params
         except Exception as e:
             logger.warning(f"MCL failed: {e}")
@@ -384,23 +423,74 @@ def run_mcl(graph: nx.Graph, inflation: float = 2.0) -> Tuple[Dict[int, Set[str]
         try:
             coms = algorithms.markov_clustering(graph, inflation=inflation)
             communities = {}
+<<<<<<< Updated upstream
             for i, com in enumerate(coms.communities):
                 communities[i] = set(com)
             
             runtime = time.time() - start_time
             params = {"inflation": inflation, "runtime": runtime}
+=======
+            cluster_id = 0
+            filtered_count = 0
+            
+            for com in coms.communities:
+                cluster_set = set(com)
+                if len(cluster_set) >= min_cluster_size:
+                    communities[cluster_id] = cluster_set
+                    cluster_id += 1
+                else:
+                    filtered_count += 1
+            
+            runtime = time.time() - start_time
+            params = {
+                "inflation": inflation,
+                "min_cluster_size": min_cluster_size,
+                "filtered_clusters": filtered_count,
+                "fallback": "cdlib",
+                "runtime": runtime
+            }
+>>>>>>> Stashed changes
             return communities, params
         except:
             pass
     
+<<<<<<< Updated upstream
     # Final fallback
+=======
+    # Final fallback: use our MCLClustering wrapper
+    try:
+        from src.mcl_clustering import MCLClustering
+        mcl = MCLClustering(inflation=inflation, min_cluster_size=min_cluster_size)
+        communities = mcl.cluster(graph)
+        runtime = time.time() - start_time
+        params = {
+            "inflation": inflation,
+            "min_cluster_size": min_cluster_size,
+            "fallback": "MCLClustering_wrapper",
+            "runtime": runtime
+        }
+        return communities, params
+    except Exception as e:
+        logger.warning(f"MCL fallback failed: {e}")
+    
+    # Last resort: connected components (no filtering)
+>>>>>>> Stashed changes
     communities = {}
     for i, component in enumerate(nx.connected_components(graph)):
         communities[i] = component
     
     runtime = time.time() - start_time
+<<<<<<< Updated upstream
     params = {"inflation": inflation, "fallback": "connected_components", "runtime": runtime}
     
+=======
+    params = {
+        "inflation": inflation,
+        "min_cluster_size": min_cluster_size,
+        "fallback": "connected_components",
+        "runtime": runtime
+    }
+>>>>>>> Stashed changes
     return communities, params
 
 
@@ -589,7 +679,12 @@ def run_lea_method(graph: nx.Graph,
 
 def evaluate_communities(communities: Dict[int, Set[str]], 
                         graph: nx.Graph,
+<<<<<<< Updated upstream
                         ground_truth: Optional[Dict[int, Set[str]]] = None) -> Dict:
+=======
+                        ground_truth: Optional[Dict[int, Set[str]]] = None,
+                        protein_go_terms: Optional[Dict[str, Set[str]]] = None) -> Dict:
+>>>>>>> Stashed changes
     """
     Evaluate community detection results.
     
@@ -597,6 +692,10 @@ def evaluate_communities(communities: Dict[int, Set[str]],
         communities: Detected communities
         graph: NetworkX graph
         ground_truth: Optional ground truth communities
+<<<<<<< Updated upstream
+=======
+        protein_go_terms: Optional GO annotations for external evaluation
+>>>>>>> Stashed changes
         
     Returns:
         Dictionary of evaluation metrics
@@ -612,6 +711,18 @@ def evaluate_communities(communities: Dict[int, Set[str]],
     metrics['modularity'] = compute_modularity(communities, graph)
     metrics['conductance'] = compute_conductance(communities, graph)
     
+<<<<<<< Updated upstream
+=======
+    # External GO-based evaluation (if GO terms available)
+    if protein_go_terms:
+        from src.evaluation import calculate_go_jaccard_similarity
+        metrics['mean_go_jaccard'] = calculate_go_jaccard_similarity(
+            communities, protein_go_terms, ground_truth
+        )
+    else:
+        metrics['mean_go_jaccard'] = None
+    
+>>>>>>> Stashed changes
     # NMI (if ground truth available)
     if ground_truth:
         metrics['nmi'] = compute_nmi(communities, ground_truth)
@@ -628,7 +739,12 @@ def compare_all_methods(graph: nx.Graph,
                         ground_truth: Optional[Dict[int, Set[str]]] = None,
                         lea_data: Optional[Dict] = None,
                         lea_evaluations: int = 500,
+<<<<<<< Updated upstream
                         random_seed: int = 42) -> pd.DataFrame:
+=======
+                        random_seed: int = 42,
+                        protein_go_terms: Optional[Dict[str, Set[str]]] = None) -> pd.DataFrame:
+>>>>>>> Stashed changes
     """
     Run all community detection methods and compare results.
     
@@ -655,7 +771,11 @@ def compare_all_methods(graph: nx.Graph,
         method_start = time.time()
         communities, params = run_louvain(graph, resolution=1.0, random_seed=random_seed)
         method_runtime = time.time() - method_start
+<<<<<<< Updated upstream
         metrics = evaluate_communities(communities, graph, ground_truth)
+=======
+        metrics = evaluate_communities(communities, graph, ground_truth, protein_go_terms)
+>>>>>>> Stashed changes
         results.append({
             'dataset': dataset_name,
             'method': 'Louvain',
@@ -668,6 +788,10 @@ def compare_all_methods(graph: nx.Graph,
             'nmi': metrics['nmi'],
             'overlapping_nmi': metrics['overlapping_nmi'],
             'conductance': metrics['conductance'],
+<<<<<<< Updated upstream
+=======
+            'mean_go_jaccard': metrics.get('mean_go_jaccard'),
+>>>>>>> Stashed changes
             'runtime_sec': method_runtime,
             'parameters': json.dumps(params)
         })
@@ -680,7 +804,11 @@ def compare_all_methods(graph: nx.Graph,
         method_start = time.time()
         communities, params = run_leiden(graph, resolution=1.0, random_seed=random_seed)
         method_runtime = time.time() - method_start
+<<<<<<< Updated upstream
         metrics = evaluate_communities(communities, graph, ground_truth)
+=======
+        metrics = evaluate_communities(communities, graph, ground_truth, protein_go_terms)
+>>>>>>> Stashed changes
         results.append({
             'dataset': dataset_name,
             'method': 'Leiden',
@@ -693,6 +821,10 @@ def compare_all_methods(graph: nx.Graph,
             'nmi': metrics['nmi'],
             'overlapping_nmi': metrics['overlapping_nmi'],
             'conductance': metrics['conductance'],
+<<<<<<< Updated upstream
+=======
+            'mean_go_jaccard': metrics.get('mean_go_jaccard'),
+>>>>>>> Stashed changes
             'runtime_sec': method_runtime,
             'parameters': json.dumps(params)
         })
@@ -705,7 +837,11 @@ def compare_all_methods(graph: nx.Graph,
         method_start = time.time()
         communities, params = run_infomap(graph, random_seed=random_seed)
         method_runtime = time.time() - method_start
+<<<<<<< Updated upstream
         metrics = evaluate_communities(communities, graph, ground_truth)
+=======
+        metrics = evaluate_communities(communities, graph, ground_truth, protein_go_terms)
+>>>>>>> Stashed changes
         results.append({
             'dataset': dataset_name,
             'method': 'Infomap',
@@ -718,6 +854,10 @@ def compare_all_methods(graph: nx.Graph,
             'nmi': metrics['nmi'],
             'overlapping_nmi': metrics['overlapping_nmi'],
             'conductance': metrics['conductance'],
+<<<<<<< Updated upstream
+=======
+            'mean_go_jaccard': metrics.get('mean_go_jaccard'),
+>>>>>>> Stashed changes
             'runtime_sec': method_runtime,
             'parameters': json.dumps(params)
         })
@@ -728,9 +868,15 @@ def compare_all_methods(graph: nx.Graph,
     logger.info("Running MCL...")
     try:
         method_start = time.time()
+<<<<<<< Updated upstream
         communities, params = run_mcl(graph, inflation=2.0)
         method_runtime = time.time() - method_start
         metrics = evaluate_communities(communities, graph, ground_truth)
+=======
+        communities, params = run_mcl(graph, inflation=2.0, min_cluster_size=10)
+        method_runtime = time.time() - method_start
+        metrics = evaluate_communities(communities, graph, ground_truth, protein_go_terms)
+>>>>>>> Stashed changes
         results.append({
             'dataset': dataset_name,
             'method': 'MCL',
@@ -743,6 +889,10 @@ def compare_all_methods(graph: nx.Graph,
             'nmi': metrics['nmi'],
             'overlapping_nmi': metrics['overlapping_nmi'],
             'conductance': metrics['conductance'],
+<<<<<<< Updated upstream
+=======
+            'mean_go_jaccard': metrics.get('mean_go_jaccard'),
+>>>>>>> Stashed changes
             'runtime_sec': method_runtime,
             'parameters': json.dumps(params)
         })
@@ -755,7 +905,11 @@ def compare_all_methods(graph: nx.Graph,
         method_start = time.time()
         communities, params = run_oslom(graph)
         method_runtime = time.time() - method_start
+<<<<<<< Updated upstream
         metrics = evaluate_communities(communities, graph, ground_truth)
+=======
+        metrics = evaluate_communities(communities, graph, ground_truth, protein_go_terms)
+>>>>>>> Stashed changes
         results.append({
             'dataset': dataset_name,
             'method': 'OSLOM',
@@ -768,6 +922,10 @@ def compare_all_methods(graph: nx.Graph,
             'nmi': metrics['nmi'],
             'overlapping_nmi': metrics['overlapping_nmi'],
             'conductance': metrics['conductance'],
+<<<<<<< Updated upstream
+=======
+            'mean_go_jaccard': metrics.get('mean_go_jaccard'),
+>>>>>>> Stashed changes
             'runtime_sec': method_runtime,
             'parameters': json.dumps(params)
         })
@@ -780,7 +938,11 @@ def compare_all_methods(graph: nx.Graph,
         method_start = time.time()
         communities, params = run_link_communities(graph)
         method_runtime = time.time() - method_start
+<<<<<<< Updated upstream
         metrics = evaluate_communities(communities, graph, ground_truth)
+=======
+        metrics = evaluate_communities(communities, graph, ground_truth, protein_go_terms)
+>>>>>>> Stashed changes
         results.append({
             'dataset': dataset_name,
             'method': 'Link_Communities',
@@ -793,6 +955,10 @@ def compare_all_methods(graph: nx.Graph,
             'nmi': metrics['nmi'],
             'overlapping_nmi': metrics['overlapping_nmi'],
             'conductance': metrics['conductance'],
+<<<<<<< Updated upstream
+=======
+            'mean_go_jaccard': metrics.get('mean_go_jaccard'),
+>>>>>>> Stashed changes
             'runtime_sec': method_runtime,
             'parameters': json.dumps(params)
         })
@@ -805,7 +971,11 @@ def compare_all_methods(graph: nx.Graph,
         method_start = time.time()
         communities, params = run_bigclam(graph)
         method_runtime = time.time() - method_start
+<<<<<<< Updated upstream
         metrics = evaluate_communities(communities, graph, ground_truth)
+=======
+        metrics = evaluate_communities(communities, graph, ground_truth, protein_go_terms)
+>>>>>>> Stashed changes
         results.append({
             'dataset': dataset_name,
             'method': 'BigCLAM',
@@ -818,6 +988,10 @@ def compare_all_methods(graph: nx.Graph,
             'nmi': metrics['nmi'],
             'overlapping_nmi': metrics['overlapping_nmi'],
             'conductance': metrics['conductance'],
+<<<<<<< Updated upstream
+=======
+            'mean_go_jaccard': metrics.get('mean_go_jaccard'),
+>>>>>>> Stashed changes
             'runtime_sec': method_runtime,
             'parameters': json.dumps(params)
         })
@@ -842,7 +1016,13 @@ def compare_all_methods(graph: nx.Graph,
             )
             method_runtime = time.time() - method_start
             
+<<<<<<< Updated upstream
             metrics = evaluate_communities(communities, graph, ground_truth)
+=======
+            # Extract protein_go_terms from lea_data if available
+            go_terms = protein_go_terms if protein_go_terms else lea_data.get('protein_go_terms', {})
+            metrics = evaluate_communities(communities, graph, ground_truth, go_terms)
+>>>>>>> Stashed changes
             results.append({
                 'dataset': dataset_name,
                 'method': 'LEA_Overlapping',
@@ -855,6 +1035,10 @@ def compare_all_methods(graph: nx.Graph,
                 'nmi': metrics['nmi'],
                 'overlapping_nmi': metrics['overlapping_nmi'],
                 'conductance': metrics['conductance'],
+<<<<<<< Updated upstream
+=======
+                'mean_go_jaccard': metrics.get('mean_go_jaccard'),
+>>>>>>> Stashed changes
                 'runtime_sec': method_runtime,
                 'parameters': json.dumps(params)
             })

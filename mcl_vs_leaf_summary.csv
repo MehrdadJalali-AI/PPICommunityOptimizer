@@ -1,0 +1,6 @@
+dataset,metric,mcl_value,leaf_value,improvement_pct,improvement_direction
+STRING,modularity,0.6334337813817797,0.64088559766303,1.1764159885812797,improvement
+STRING,conductance,0.236156162485285,0.2470751897390252,-4.623646971067529,degradation
+Gavin,modularity,0.0258531770404188,0.0258531770404418,8.897333296983388e-11,improvement
+Gavin,conductance,0.0673352435530086,0.0673352435530086,0.0,no change
+Gavin,mean_go_jaccard,0.173233878207369,0.173233878207369,0.0,no change

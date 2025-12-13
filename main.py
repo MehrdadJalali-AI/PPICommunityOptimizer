@@ -73,6 +73,8 @@ def main():
                        help='Cache directory for downloaded files')
     parser.add_argument('--mcl-inflation', type=float, default=2.0,
                        help='MCL inflation parameter')
+    parser.add_argument('--mcl-min-cluster-size', type=int, default=10,
+                       help='Minimum cluster size to include (filters small clusters for biological interpretability)')
     parser.add_argument('--alpha', type=float, default=0.5,
                        help='Membership weight parameter (0-1)')
     parser.add_argument('--overlap-tau', type=float, default=0.1,
@@ -171,7 +173,7 @@ def main():
     
     # Step 3: MCL clustering
     logger.info("\n[Step 3] Running MCL clustering...")
-    mcl = MCLClustering(inflation=args.mcl_inflation)
+    mcl = MCLClustering(inflation=args.mcl_inflation, min_cluster_size=args.mcl_min_cluster_size)
     initial_clusters = mcl.cluster(graph)
     logger.info(f"MCL found {len(initial_clusters)} clusters")
     

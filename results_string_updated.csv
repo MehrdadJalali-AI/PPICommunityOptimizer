@@ -1,0 +1,9 @@
+dataset,method,overlapping,num_nodes,num_edges,num_communities,avg_community_size,modularity,nmi,overlapping_nmi,conductance,mean_go_jaccard,runtime_sec,parameters
+STRING,Louvain,False,5966,120386,24,248.58333333333334,0.6336746637958528,,,0.13775776144974958,,1.8012189865112305,"{""resolution"": 1.0, ""random_seed"": 42, ""runtime"": 1.8011970520019531}"
+STRING,Leiden,False,5966,120386,24,248.58333333333334,0.6336746637958528,,,0.13775776144974958,,1.8639369010925293,"{""resolution"": 1.0, ""random_seed"": 42, ""runtime"": 1.8638460636138916}"
+STRING,Infomap,False,5966,120386,11,542.3636363636364,0.0009847838814173414,,,0.0,,0.008810043334960938,"{""random_seed"": 42, ""fallback"": ""connected_components"", ""runtime"": 0.008748769760131836}"
+STRING,MCL,False,5966,120386,14,424.0,0.6334337813817797,,,0.236156162485285,,2.061812162399292,"{""inflation"": 2.0, ""min_cluster_size"": 10, ""fallback"": ""MCLClustering_wrapper"", ""runtime"": 2.0616722106933594}"
+STRING,OSLOM,False,5966,120386,11,542.3636363636364,0.0009847838814173414,,,0.0,,0.007806062698364258,"{""fallback"": ""connected_components"", ""runtime"": 0.007754087448120117}"
+STRING,Link_Communities,True,5966,120386,11,542.3636363636364,0.0009847838814173414,,,0.0,,0.008059978485107422,"{""fallback"": ""connected_components"", ""runtime"": 0.007999897003173828}"
+STRING,BigCLAM,True,5966,120386,11,542.3636363636364,0.0009847838814173414,,,0.0,,0.007796049118041992,"{""num_communities"": null, ""fallback"": ""connected_components"", ""runtime"": 0.007737874984741211}"
+STRING,LEA_Overlapping,True,5966,120386,14,424.0,0.64088559766303,,,0.24707518973902529,,181.5402331352234,"{""alpha"": 0.3764306978054222, ""overlap_tau"": 0.9093643187837515, ""transfer_tau"": 0.7338617838478629, ""lea_evaluations"": 500, ""random_seed"": 42}"

@@ -240,6 +240,12 @@ def evaluate_clusters(clusters: Dict[int, Set[str]],
         clusters, protein_go_terms, go_tfidf
     )
     
+    # External GO-based evaluation (separate from FD)
+    # Mean Jaccard similarity between GO term sets
+    metrics['mean_go_jaccard'] = calculate_go_jaccard_similarity(
+        clusters, protein_go_terms, gold_standard
+    )
+    
     # Cluster statistics
     cluster_sizes = [len(c) for c in clusters.values() if len(c) > 0]
     metrics['num_clusters'] = len(cluster_sizes)
@@ -314,6 +320,104 @@ def calculate_precision_recall_f1(predicted: Dict[int, Set[str]],
     f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0.0
     
     return precision, recall, f1
+
+
+def calculate_go_jaccard_similarity(clusters: Dict[int, Set[str]],
+                                   protein_go_terms: Dict[str, Set[str]],
+                                   reference_complexes: Optional[Dict[int, Set[str]]] = None) -> float:
+    """
+    Calculate external GO-based evaluation metric: Mean Jaccard similarity
+    between GO term sets of detected communities and reference complexes/pathways.
+    
+    This is an EXTERNAL evaluation metric (separate from FD which is internal/optimization-guiding).
+    Used only for evaluation/reporting, not for optimization.
+    
+    Option A: Jaccard similarity between GO term sets of detected communities
+    and reference (ground-truth) complexes/pathways.
+    
+    Args:
+        clusters: Detected clusters (cluster_id -> set of proteins)
+        protein_go_terms: Dict mapping protein ID to set of GO terms
+        reference_complexes: Optional reference complexes for comparison
+                           If None, computes average pairwise Jaccard within clusters
+        
+    Returns:
+        Mean Jaccard similarity score (0-1)
+    """
+    if not clusters or not protein_go_terms:
+        return 0.0
+    
+    jaccard_scores = []
+    
+    if reference_complexes is not None:
+        # Compare detected clusters against reference complexes
+        for cluster_id, cluster in clusters.items():
+            if len(cluster) == 0:
+                continue
+            
+            # Get GO terms for this cluster
+            cluster_go_terms = set()
+            for protein in cluster:
+                if protein in protein_go_terms:
+                    cluster_go_terms.update(protein_go_terms[protein])
+            
+            if not cluster_go_terms:
+                continue
+            
+            # Find best matching reference complex
+            best_jaccard = 0.0
+            for ref_id, ref_cluster in reference_complexes.items():
+                # Get GO terms for reference complex
+                ref_go_terms = set()
+                for protein in ref_cluster:
+                    if protein in protein_go_terms:
+                        ref_go_terms.update(protein_go_terms[protein])
+                
+                if not ref_go_terms:
+                    continue
+                
+                # Calculate Jaccard similarity between GO term sets
+                intersection = len(cluster_go_terms & ref_go_terms)
+                union = len(cluster_go_terms | ref_go_terms)
+                jaccard = intersection / union if union > 0 else 0.0
+                
+                best_jaccard = max(best_jaccard, jaccard)
+            
+            if best_jaccard > 0:
+                jaccard_scores.append(best_jaccard)
+    else:
+        # No reference: compute average pairwise Jaccard similarity within clusters
+        # This measures GO coherence within detected communities
+        for cluster_id, cluster in clusters.items():
+            if len(cluster) < 2:
+                continue
+            
+            # Get GO term sets for all proteins in cluster
+            protein_go_sets = []
+            for protein in cluster:
+                if protein in protein_go_terms:
+                    go_set = protein_go_terms[protein]
+                    if go_set:
+                        protein_go_sets.append(go_set)
+            
+            if len(protein_go_sets) < 2:
+                continue
+            
+            # Calculate pairwise Jaccard similarities
+            cluster_jaccards = []
+            for i, go_set1 in enumerate(protein_go_sets):
+                for go_set2 in protein_go_sets[i+1:]:
+                    intersection = len(go_set1 & go_set2)
+                    union = len(go_set1 | go_set2)
+                    jaccard = intersection / union if union > 0 else 0.0
+                    cluster_jaccards.append(jaccard)
+            
+            if cluster_jaccards:
+                # Average Jaccard within cluster
+                avg_jaccard = np.mean(cluster_jaccards)
+                jaccard_scores.append(avg_jaccard)
+    
+    return np.mean(jaccard_scores) if jaccard_scores else 0.0
 
 
 def calculate_overlapping_nmi(predicted: Dict[int, Set[str]],

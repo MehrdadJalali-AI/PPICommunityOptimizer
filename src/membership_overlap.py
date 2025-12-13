@@ -14,11 +14,18 @@ logger = logging.getLogger(__name__)
 def calculate_functional_dependency(protein: str, cluster: Set[str],
                                    protein_go_terms: Dict[str, Set[str]],
                                    go_tfidf: 'GOTFIDF',
-                                   cluster_id: int) -> float:
+                                   cluster_id: int,
+                                   normalize: bool = True) -> float:
     """
     Calculate functional dependency fd(p,c) (Eq.2).
     
-    fd(p,c) = sum of TF-IDF scores of GO terms shared between protein and cluster
+    fd(p,c) = (1/|GO(p)|) * sum_{t in GO(p)} TF-IDF(t, c)
+    
+    IMPORTANT: FD is normalized to [-1, 1] range to ensure comparability
+    with permanence before combination in membership score.
+    
+    Note: TF-IDF captures functional specificity (term importance within cluster
+    relative to other clusters), not statistical variance.
     
     Args:
         protein: Protein ID
@@ -26,9 +33,10 @@ def calculate_functional_dependency(protein: str, cluster: Set[str],
         protein_go_terms: Dict mapping protein ID to GO terms
         go_tfidf: GOTFIDF instance for TF-IDF scores
         cluster_id: Cluster ID
+        normalize: If True, normalize to [-1, 1] range
         
     Returns:
-        Functional dependency score
+        Functional dependency score (normalized to [-1, 1] if normalize=True)
     """
     if protein not in protein_go_terms:
         return 0.0
@@ -47,6 +55,19 @@ def calculate_functional_dependency(protein: str, cluster: Set[str],
     if len(protein_terms) > 0:
         fd_score = fd_score / len(protein_terms)
     
+    # Normalize to [-1, 1] range for comparability with permanence
+    if normalize:
+        # TF-IDF scores are non-negative, so we normalize to [0, 1] first
+        # then map to [-1, 1] by: normalized = 2 * (fd / max_fd) - 1
+        # For simplicity and to ensure bounded range, use tanh which naturally bounds to [-1, 1]
+        # This handles the case where we don't know the theoretical maximum TF-IDF
+        import math
+        fd_normalized = math.tanh(fd_score)
+        
+        # Ensure strict bounds
+        fd_normalized = max(-1.0, min(1.0, fd_normalized))
+        return fd_normalized
+    
     return fd_score
 
 
@@ -59,7 +80,15 @@ def calculate_membership(protein: str, cluster: Set[str], cluster_id: int,
     """
     Calculate Membership(p,c) (Eq.4).
     
-    Membership(p,c) = alpha * Perm(p,c) + (1 - alpha) * fd(p,c)
+    Membership(p,c) = alpha * Perm_norm(p,c) + (1 - alpha) * fd_norm(p,c)
+    
+    Where:
+    - Perm_norm: Normalized permanence in range [-1, 1]
+    - fd_norm: Normalized functional dependency in range [-1, 1]
+    - alpha ∈ [0,1]: Weight parameter balancing structural and functional contributions
+    
+    IMPORTANT: Both permanence and functional dependency are normalized to [-1, 1]
+    before combination to ensure comparable scales and theoretical consistency.
     
     Args:
         protein: Protein ID
@@ -68,21 +97,27 @@ def calculate_membership(protein: str, cluster: Set[str], cluster_id: int,
         graph: NetworkX graph
         protein_go_terms: Dict mapping protein ID to GO terms
         go_tfidf: GOTFIDF instance
-        permanence_scores: Pre-computed permanence scores
+        permanence_scores: Pre-computed permanence scores (already normalized)
         alpha: Weight parameter (0-1) balancing permanence and functional dependency
         
     Returns:
-        Membership score
+        Membership score (in range [-1, 1] since both inputs are normalized)
     """
-    # Get permanence
-    perm = permanence_scores.get(protein, {}).get(cluster_id, 0.0)
+    # Ensure alpha is in valid range
+    alpha = max(0.0, min(1.0, alpha))
     
-    # Get functional dependency
-    fd = calculate_functional_dependency(protein, cluster, protein_go_terms, 
-                                          go_tfidf, cluster_id)
+    # Get normalized permanence (already normalized to [-1, 1])
+    perm_norm = permanence_scores.get(protein, {}).get(cluster_id, 0.0)
     
-    # Calculate membership (Eq.4)
-    membership = alpha * perm + (1 - alpha) * fd
+    # Get normalized functional dependency (normalized to [-1, 1])
+    fd_norm = calculate_functional_dependency(protein, cluster, protein_go_terms, 
+                                              go_tfidf, cluster_id, normalize=True)
+    
+    # Calculate membership (Eq.4) with normalized inputs
+    membership = alpha * perm_norm + (1 - alpha) * fd_norm
+    
+    # Ensure membership stays in [-1, 1] range (should be automatic, but add assertion)
+    membership = max(-1.0, min(1.0, membership))
     
     return membership
 

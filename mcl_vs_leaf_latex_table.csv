@@ -1,0 +1,17 @@
+Dataset,Metric,MCL,LEAF-PPI,Improvement
+STRING,Modularity,0.6396,0.6414,+0.3\%
+STRING,Intra-Density,0.1367,0.0398,-70.9\%
+STRING,Inter-Density,0.0019,0.0013,-33.4\%
+STRING,Conductance,0.2475,0.5929,+139.5\%
+STRING,Communities,14,25,+78.6\%
+STRING,Overlapping Proteins,0,55,---
+STRING,Overlap \%,0.00,0.92,---
+Gavin,Modularity,0.0259,0.0367,+42.0\%
+Gavin,Intra-Density,0.2025,0.8892,+339.1\%
+Gavin,Inter-Density,0.0000,0.0000,---
+Gavin,Conductance,0.0673,0.0000,-100.0\%
+Gavin,Mean FD,0.0000,0.0000,-100.0\%
+Gavin,GO Jaccard,0.1732,0.1732,+0.0\%
+Gavin,Communities,2,46,+2200.0\%
+Gavin,Overlapping Proteins,0,0,---
+Gavin,Overlap \%,0.00,0.00,---

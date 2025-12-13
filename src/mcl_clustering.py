@@ -18,14 +18,17 @@ class MCLClustering:
     Requires MCL to be installed: https://micans.org/mcl/
     """
     
-    def __init__(self, inflation: float = 2.0):
+    def __init__(self, inflation: float = 2.0, min_cluster_size: int = 10):
         """
         Initialize MCL clustering.
         
         Args:
             inflation: MCL inflation parameter (higher = more clusters)
+            min_cluster_size: Minimum cluster size to include (filters small clusters)
+                            Default: 10 (matches biological interpretability standards)
         """
         self.inflation = inflation
+        self.min_cluster_size = min_cluster_size
     
     def cluster(self, graph: nx.Graph) -> Dict[int, Set[str]]:
         """
@@ -61,18 +64,24 @@ class MCLClustering:
             cmd = ['mcl', tmp_in_path, '--abc', '-I', str(self.inflation), '-o', tmp_out_path]
             result = subprocess.run(cmd, capture_output=True, text=True, check=True)
             
-            # Parse MCL output
+            # Parse MCL output and filter small clusters
             clusters = {}
             cluster_id = 0
+            filtered_count = 0
             
             with open(tmp_out_path, 'r') as f:
                 for line in f:
                     proteins = line.strip().split('\t')
                     if proteins and proteins[0]:
-                        clusters[cluster_id] = set(proteins)
-                        cluster_id += 1
+                        cluster_set = set(proteins)
+                        # Filter clusters smaller than min_cluster_size
+                        if len(cluster_set) >= self.min_cluster_size:
+                            clusters[cluster_id] = cluster_set
+                            cluster_id += 1
+                        else:
+                            filtered_count += 1
             
-            logger.info(f"MCL found {len(clusters)} clusters")
+            logger.info(f"MCL found {len(clusters)} clusters (filtered {filtered_count} clusters < {self.min_cluster_size} proteins)")
             return clusters
             
         except subprocess.CalledProcessError as e:
@@ -96,13 +105,25 @@ class MCLClustering:
             partition = community_louvain.best_partition(graph)
             
             clusters = {}
+            filtered_count = 0
+            
             for node, cluster_id in partition.items():
                 if cluster_id not in clusters:
                     clusters[cluster_id] = set()
                 clusters[cluster_id].add(node)
             
-            logger.info(f"Louvain found {len(clusters)} clusters")
-            return clusters
+            # Filter small clusters
+            filtered_clusters = {}
+            cluster_id_new = 0
+            for old_id, cluster_set in clusters.items():
+                if len(cluster_set) >= self.min_cluster_size:
+                    filtered_clusters[cluster_id_new] = cluster_set
+                    cluster_id_new += 1
+                else:
+                    filtered_count += 1
+            
+            logger.info(f"Louvain found {len(filtered_clusters)} clusters (filtered {filtered_count} clusters < {self.min_cluster_size} proteins)")
+            return filtered_clusters
         except ImportError:
             logger.warning("python-louvain not available. Using simple connected components.")
             clusters = {}
