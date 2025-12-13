@@ -9,7 +9,7 @@ optimization of overlapping, annotation-aware communities.
 ### LEAF-PPI Workflow Overview
 
 <p align="center">
-  <img src="LEAF-PPI1.jpg" alt="LEAF-PPI Workflow Diagram" width="400" height="400">
+  <img src="LEAF-PPI-1.jpg" alt="LEAF-PPI Workflow Diagram" width="400" height="400">
 </p>
 
 <p align="center">
