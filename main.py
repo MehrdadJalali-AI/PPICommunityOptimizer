@@ -141,6 +141,24 @@ def main():
     
     if not os.path.exists(args.go_file):
         logger.error(f"GO file not found: {args.go_file}")
+        logger.error("\n" + "="*60)
+        logger.error("ERROR: GO annotation file is missing!")
+        logger.error("="*60)
+        if args.mode == 'string':
+            logger.error("\nFor STRING mode, you need a GOA GAF file.")
+            logger.error("Options:")
+            logger.error("  1. Download GOA GAF file:")
+            logger.error("     python download_goa.py")
+            logger.error("     OR manually from: https://www.ebi.ac.uk/GOA/downloads")
+            logger.error("  2. Use Gavin mode instead (uses GO.txt):")
+            logger.error("     python main.py --mode gavin --ppi gavin2006_socioaffinities_rescaled.txt --go-file GO.txt --go-use-symbol --go-taxid 559292")
+            logger.error("  3. Skip STRING mode and run only Gavin:")
+            logger.error("     python run_all.py  # Will skip STRING if GO file missing")
+        else:
+            logger.error(f"\nFor {args.mode} mode, check that the GO file exists:")
+            logger.error(f"  Expected: {args.go_file}")
+            logger.error(f"  Current directory: {os.getcwd()}")
+        logger.error("="*60)
         sys.exit(1)
     
     protein_go_terms = go_loader.load_from_gaf(

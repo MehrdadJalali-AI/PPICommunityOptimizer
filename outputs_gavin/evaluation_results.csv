@@ -1,2 +1,2 @@
 intra_density_mean,inter_density_mean,conductance_mean,overlapping_modularity,mean_fd_per_cluster,num_clusters,num_singletons,mean_cluster_size,max_cluster_size,min_cluster_size
-0.8892393053949911,0.0,0.0,0.03671187574059956,0.014878388278084896,46,0,40.43478260869565,1727,2
+0.8892393053949911,0.0,0.0,0.036711875740577986,0.014878388278084896,46,0,40.43478260869565,1727,2
