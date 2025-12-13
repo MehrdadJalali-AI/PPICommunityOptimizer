@@ -1,6 +1,24 @@
 # Community Detection Pipeline with LEA Optimization
 
-A complete Python pipeline for protein-protein interaction (PPI) network community detection using the Lotus Effect Algorithm (LEA) for optimization.
+A complete Python pipeline for protein–protein interaction (PPI) network
+community detection using the Lotus Effect Algorithm (LEA) for
+optimization of overlapping, annotation-aware communities.
+
+---
+
+### LEAF-PPI Workflow Overview
+
+<p align="center">
+  <img src="LEAF-PPI1.jpg" alt="LEAF-PPI Workflow Diagram" width="400" height="400">
+</p>
+
+<p align="center">
+  <em>Figure: End-to-end workflow of the LEAF-PPI framework, illustrating data
+  preprocessing, initial clustering, GO-aware functional analysis, and
+  Lotus Effect Algorithm–based optimization for overlapping community
+  detection in PPI networks.</em>
+</p>
+
 
 ## Overview
 
