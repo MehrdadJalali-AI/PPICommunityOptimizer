@@ -1,4 +1,5 @@
-# Optimizing Overlapping Protein Community Detection in PPI Networks using Lotus Effect Algorithm with Functional Dependency and Permanence Metrics
+# LEAF-PPI: Lotus Effect Optimized Annotation-Aware Overlapping Community Detection in Protein–Protein Interaction Networks
+
 <div align="center">
   <img src="PPILEA2.jpg" alt="Overlapping Protein Community Detection with Lotus Effect Algorithm" width="500"/>
 </div>
