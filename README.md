@@ -3,7 +3,7 @@
 ### LEAF-PPI: Conceptual Illustration
 
 <p align="center">
-  <img src="LEAF-PPI-1.jpg" alt="Conceptual illustration of LEAF-PPI" width="400" height="400">
+  <img src="LEAF-PPI-2.jpg" alt="Conceptual illustration of LEAF-PPI" width="400" height="400">
 </p>
 
 <p align="center">
@@ -306,7 +306,7 @@ If GO annotations are not available, the pipeline will still run but:
 - GO coherence metrics will be unavailable
 
 <p align="center">
-  <img src="LEAF-PPI-2.jpg" alt="Conceptual illustration of LEAF-PPI" width="400" height="400">
+  <img src="LEAF-PPI-1.jpg" alt="Conceptual illustration of LEAF-PPI" width="400" height="400">
 </p>
 
 ## Citation
